@@ -113,32 +113,65 @@ def getDevices() {
 def addDevices() {
     def devices = getDevices()
 
-    selectedDevices.each { dni ->
-        def selectedDevice = devices.find { it.value.mac == dni }
-        def d
-        if (selectedDevice) {
-            d = getChildDevices()?.find {
-                it.deviceNetworkId == selectedDevice.value.mac
-            }
+	// DEBUG
+    log.debug "selectedDevices total ${selectedDevices}"
+	selectedDevices.each {
+    	//log.debug "selectedDevices it ${it.value}"
+    
+    }
+    //log.debug "devices sum"
+    log.debug "devices total ${devices}"
+    //log.debug "devices.length ${devices.size()}"
+    //devices.each {
+    //	log.debug "device it ${it}"
+    	//log.debug "device it ${it.value}"
+    	//log.debug "device it ${it.value.mac}"
+    //}
+    
+    def selDevices = []
+    devices.each {
+    	log.debug "device mac: ${it.value.mac}"
+        if (it.value.mac == selectedDevices) {
+        	selDevices.add(it.value)
         }
-
+    }
+    log.debug "selDevices ${selDevices}"
+    selDevices.each {
+    	log.debug "cur selDevice it ${it}"
+    	//log.debug "cur selDevice it.value ${it.value}"
+    	def selectedDevice = it
+      	log.debug "selectedDevice, getting child devices"
+      	//log.debug "selectedDevice2 it ${it.value}"
+      	//log.debug "selectedDevice3 it ${selectedDevice.value}"
+		def children = getChildDevices()
+        log.debug "childDevices ${children}"
+        def d = getChildDevices()?.find {
+			it.deviceNetworkId == selectedDevice.mac
+		}
+        log.debug "about to test"
+        log.debug "about to test1"
+        log.debug "about to test2"
+        
         if (!d) {
-            log.debug "Creating Denon AV receiver with dni: ${selectedDevice.value.mac}"
-            addChildDevice("billsq", "Denon AV Receiver", selectedDevice.value.mac, selectedDevice?.value.hub, [
-                "label": selectedDevice.value.name,
+            //log.debug "Creating Denon AV receiver with dev: ${selectedDevice}"
+            //log.debug "Creating Denon AV receiver with val: ${selectedDevice.value}"
+            //log.debug "Creating Denon AV receiver with dni: ${selectedDevice.value.mac}"
+            addChildDevice("billsq", "Denon AV Receiver", selectedDevice.mac, selectedDevice?.hub, [
+                "label": selectedDevice.name,
                 "data": [
-                    "mac": selectedDevice.value.mac,
-                    "ip": selectedDevice.value.networkAddress,
-                    "port": selectedDevice.value.deviceAddress,
-                    "apiPort": selectedDevice.value.apiPort,
-                    "RenderingControlControlPath": selectedDevice.value.RenderingControlControlPath,
-                    "RenderingControlEventPath": selectedDevice.value.RenderingControlEventPath,
-                    "AVTransportControlPath": selectedDevice.value.AVTransportControlPath,
-                    "AVTransportEventPath": selectedDevice.value.AVTransportEventPath
+                    "mac": selectedDevice.mac,
+                    "ip": selectedDevice.networkAddress,
+                    "port": selectedDevice.deviceAddress,
+                    "apiPort": selectedDevice.apiPort,
+                    "RenderingControlControlPath": selectedDevice.RenderingControlControlPath,
+                    "RenderingControlEventPath": selectedDevice.RenderingControlEventPath,
+                    "AVTransportControlPath": selectedDevice.AVTransportControlPath,
+                    "AVTransportEventPath": selectedDevice.AVTransportEventPath
                 ]
             ])
         }
     }
+    // END DEBUG
 }
 
 def ssdpHandler(evt) {
